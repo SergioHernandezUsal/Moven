@@ -212,16 +212,16 @@ def main():
         min_tracking_confidence=0.55
     )
 
-    print("🔍 Iniciando cámara...")
+    print("Iniciando cámara...")
 
     cap = None
 
-    # 🔥 SOLO DirectShow (evita pantalla negra)
+    
     for i in range(3):
         temp = cv2.VideoCapture(i, cv2.CAP_DSHOW)
 
         if temp.isOpened():
-            # ⚡ CLAVE: forzar formato MJPG
+           
             temp.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
             temp.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
             temp.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -232,17 +232,17 @@ def main():
 
             if ret and frame is not None and frame.mean() > 10:
                 cap = temp
-                print(f"✅ Cámara OK en índice {i}")
+                print(f" Cámara OK en índice {i}")
                 break
             else:
-                print(f"⚠️ Cámara {i} negra")
+                print(f" Cámara {i} negra")
                 temp.release()
 
     if cap is None:
-        print("❌ No se pudo acceder a ninguna cámara")
+        print("No se pudo acceder a ninguna cámara")
         return
 
-    # 🔥 IMPORTANTE: desbloquea el splash
+   
     app_ready = True
 
     historial_x         = deque(maxlen=HISTORIAL_FRAMES)
@@ -282,7 +282,7 @@ def main():
             frame = cv2.flip(frame, 1)
             h, w  = frame.shape[:2]
 
-            # Timestamp real para MediaPipe
+            
             timestamp_ms = int(time.time() * 1000)
 
             rgb    = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
