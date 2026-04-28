@@ -59,20 +59,8 @@ TIEMPO_CERRAR            = 4.0
 app_ready    = False
 splash_pos_x = 0
 splash_pos_y = 0
-
 # ── Modelo ─────────────────────────────────────────────
-def get_model_path():
-    if getattr(sys, 'frozen', False):
-        return os.path.join(sys._MEIPASS, "hand_landmarker.task")
-    return "hand_landmarker.task"
-
-MODEL_PATH = get_model_path()
-MODEL_URL  = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
-
-if not os.path.exists(MODEL_PATH):
-    print("Descargando modelo (~25 MB), espera...")
-    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
-    print("Modelo descargado.")
+MODEL_PATH = resource_path("hand_landmarker.task")
 
 # ── Landmarks ──────────────────────────────────────────
 PUNTAS = [4, 8, 12, 16, 20]
@@ -212,16 +200,16 @@ def main():
         min_tracking_confidence=0.55
     )
 
-    print("Iniciando cámara...")
+    print("🔍 Iniciando cámara...")
 
     cap = None
 
-    
+    # 🔥 SOLO DirectShow (evita pantalla negra)
     for i in range(3):
         temp = cv2.VideoCapture(i, cv2.CAP_DSHOW)
 
         if temp.isOpened():
-           
+            # ⚡ CLAVE: forzar formato MJPG
             temp.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
             temp.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
             temp.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -232,17 +220,17 @@ def main():
 
             if ret and frame is not None and frame.mean() > 10:
                 cap = temp
-                print(f" Cámara OK en índice {i}")
+                print(f"✅ Cámara OK en índice {i}")
                 break
             else:
-                print(f" Cámara {i} negra")
+                print(f"⚠️ Cámara {i} negra")
                 temp.release()
 
     if cap is None:
-        print("No se pudo acceder a ninguna cámara")
+        print("❌ No se pudo acceder a ninguna cámara")
         return
 
-   
+    # 🔥 IMPORTANTE: desbloquea el splash
     app_ready = True
 
     historial_x         = deque(maxlen=HISTORIAL_FRAMES)
@@ -282,7 +270,7 @@ def main():
             frame = cv2.flip(frame, 1)
             h, w  = frame.shape[:2]
 
-            
+            # Timestamp real para MediaPipe
             timestamp_ms = int(time.time() * 1000)
 
             rgb    = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
